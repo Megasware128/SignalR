@@ -40,9 +40,9 @@ namespace Microsoft.AspNetCore.SignalR.Common.Tests.Internal.Formatters
         {
             var encoded = new byte[]
             {
-                /* length: */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                /* length: */ 0x00,
                     /* body: <empty> */
-                /* length: */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0E,
+                /* length: */ 0x0E,
                     /* body: */ 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x2C, 0x0D, 0x0A, 0x57, 0x6F, 0x72, 0x6C, 0x64, 0x21,
             };
             ReadOnlyBuffer<byte> buffer = encoded;
@@ -62,7 +62,7 @@ namespace Microsoft.AspNetCore.SignalR.Common.Tests.Internal.Formatters
 
         [Theory]
         [InlineData(new byte[0])] // Empty
-        [InlineData(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x00, 0x00 })] // Not enough data for payload
+        [InlineData(new byte[] { 0x09, 0x00, 0x00 })] // Not enough data for payload
         public void ReadIncompleteMessages(byte[] encoded)
         {
             ReadOnlyBuffer<byte> buffer = encoded;

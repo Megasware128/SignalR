@@ -14,7 +14,8 @@ namespace Microsoft.AspNetCore.SignalR.Internal.Formatters
         {
             var lenBuffer = new byte[5];
             var lenNumBytes = 0;
-            for (var length = payload.Length; length > 0; lenNumBytes++)
+            var length = payload.Length;
+            do
             {
                 lenBuffer[lenNumBytes] = (byte)(length & 0x7f);
                 length = length >> ((lenNumBytes + 1) * 7);
@@ -22,7 +23,9 @@ namespace Microsoft.AspNetCore.SignalR.Internal.Formatters
                 {
                     lenBuffer[lenNumBytes] = (byte)(lenBuffer[lenNumBytes] | 0x80);
                 }
+                lenNumBytes++;
             }
+            while (length > 0);
 
             var buffer = ArrayPool<byte>.Shared.Rent(lenNumBytes + payload.Length);
             var bufferSpan = buffer.AsSpan();
