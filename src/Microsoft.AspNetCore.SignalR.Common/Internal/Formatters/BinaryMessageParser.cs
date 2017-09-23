@@ -10,33 +10,41 @@ namespace Microsoft.AspNetCore.SignalR.Internal.Formatters
     {
         public static bool TryParseMessage(ref ReadOnlyBuffer<byte> buffer, out ReadOnlyBuffer<byte> payload)
         {
-            long length = 0;
-            payload = default(ReadOnlyBuffer<byte>);
+            payload = default;
 
-            if (buffer.Length < sizeof(long))
+            if (buffer.IsEmpty)
             {
                 return false;
             }
 
-            // Read the length
-            length = buffer.Span.Slice(0, sizeof(long)).ReadBigEndian<long>();
+            var length = 0U;
+            var numBytes = 0;
 
-            if (length > Int32.MaxValue)
+            byte byteRead;
+            do
+            {
+                byteRead = buffer.Span.Slice(numBytes, sizeof(byte)).Read<byte>();
+                length = length | (((uint)(byteRead & 0x7f)) << (numBytes * 7));
+                numBytes++;
+            }
+            while (numBytes <= 5 && ((byteRead & 0x80) != 0));
+
+            if ((byteRead & 0x80) != 0)
             {
                 throw new FormatException("Messages over 2GB in size are not supported");
             }
 
             // We don't have enough data
-            if (buffer.Length < (int)length + sizeof(long))
+            if (buffer.Length < length + numBytes)
             {
                 return false;
             }
 
             // Get the payload
-            payload = buffer.Slice(sizeof(long), (int)length);
+            payload = buffer.Slice(numBytes, (int)length);
 
             // Skip the payload
-            buffer = buffer.Slice((int)length + sizeof(long));
+            buffer = buffer.Slice(numBytes + (int)length);
             return true;
         }
     }
