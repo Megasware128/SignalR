@@ -5,7 +5,8 @@ import { ConnectionClosed } from "./Common"
 import { IConnection } from "./IConnection"
 import { HttpConnection} from "./HttpConnection"
 import { TransportType, TransferMode } from "./Transports"
-import { Subject, Observable } from "./Observable"
+import { Subject } from "rxjs/Subject"
+import { Observable } from "rxjs/Observable"
 import { IHubProtocol, ProtocolType, MessageType, HubMessage, CompletionMessage, ResultMessage, InvocationMessage, NegotiationMessage } from "./IHubProtocol";
 import { JsonHubProtocol } from "./JsonHubProtocol";
 import { TextMessageFormat } from "./Formatters"
